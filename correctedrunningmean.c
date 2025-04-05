@@ -3,7 +3,6 @@
   Title: Weighted Running Application in C*/
   #include <stdio.h>
   #include <stdlib.h>
-  
   void WeightedRunningMean(double* measurements, double* weightedRunningMean, int numInRunningMean);
   void printRunningMeans(double* runningMean, int numMeas);
   
@@ -15,7 +14,7 @@
       /*File opening with 3 tries*/ 
       for (try = 0; try < 3; try++) {
           printf("Enter the name of the input file: ");
-          scanf("%255s", filename);
+          scanf("%s", filename);
           Inputp = fopen(filename, "r");
           if (Inputp == NULL) {
               fprintf(stderr, "ERROR: Input file %s not opened\n", filename);
@@ -29,13 +28,19 @@
       }
   
       /*Check if file is empty*/ 
-      fseek(Inputp, 0, SEEK_END);
-      if (ftell(Inputp) == 0) {
-          fprintf(stderr, "ERROR: input file is empty\n");
-          fclose(Inputp);
-          exit(1);
+      int firstChar = fgetc(Inputp);
+      if (firstChar == EOF) {
+        if (feof(Inputp)) {
+            fprintf(stderr, "ERROR: input file is empty\n");
+            fclose(Inputp);
+            exit(1);
+        } else {
+            fprintf(stderr, "ERROR: error reading file\n");
+            fclose(Inputp);
+            exit(1);
+        }
       }
-      rewind(Inputp);
+ungetc(firstChar, Inputp);
   
       /*Get numMeas with validation and 3 trials*/ 
       int numMeas;
